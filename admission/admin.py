@@ -75,10 +75,36 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('get_student_name', 'amount', 'status', 'reference', 'created_at')
+    list_display = ('get_student_name', 'amount', 'status', 'reference', 'paystack_reference', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('reference', 'student__user__username', 'student__user__email')
     readonly_fields = ('created_at', 'updated_at')
+    
+    actions = ['mark_as_successful', 'mark_as_failed']
+    
+    def mark_as_successful(self, request, queryset):
+        """Mark selected payments as successful and update student status"""
+        updated = 0
+        for payment in queryset:
+            if payment.status != 'success':
+                payment.status = 'success'
+                payment.save()
+                
+                # Update student status
+                student = payment.student
+                student.has_paid = True
+                student.can_apply = True
+                student.save()
+                updated += 1
+        
+        self.message_user(request, f"{updated} payments marked as successful and student access granted.")
+    mark_as_successful.short_description = "Mark selected payments as successful"
+    
+    def mark_as_failed(self, request, queryset):
+        """Mark selected payments as failed"""
+        updated = queryset.update(status='failed')
+        self.message_user(request, f"{updated} payments marked as failed.")
+    mark_as_failed.short_description = "Mark selected payments as failed"
     
     def get_student_name(self, obj):
         return obj.student.user.get_full_name()

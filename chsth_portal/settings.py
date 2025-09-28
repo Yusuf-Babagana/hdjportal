@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'admission',
-    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -95,11 +94,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-
 # Login/Logout URLs
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
@@ -108,6 +102,13 @@ LOGOUT_REDIRECT_URL = '/'
 # Paystack Configuration
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='')
 PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='')
+
 # Application Fee
 APPLICATION_FEE = 7500  # in Naira (kobo for Paystack)
 APPLICATION_FEE_KOBO = APPLICATION_FEE * 100
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

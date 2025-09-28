@@ -29,6 +29,20 @@ class Student(models.Model):
     can_apply = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def payment_status(self):
+        """Get the current payment status"""
+        if self.has_paid:
+            return 'paid'
+        elif self.referral_code:
+            return 'referral'
+        else:
+            return 'pending'
+    
+    @property
+    def latest_payment(self):
+        """Get the latest payment for this student"""
+        return self.payments.order_by('-created_at').first()
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.user.email}"
 

@@ -96,30 +96,35 @@ def initiate_payment(request):
         student = get_object_or_404(Student, user=request.user)
         
         if student.has_paid or student.can_apply:
-            return JsonResponse({'error': 'Payment already completed or not required'})
+            return JsonResponse({'error': 'Payment already completed or not required'}, status=400)
         
-        # Create payment record
-        reference = str(uuid.uuid4())
-        payment = Payment.objects.create(
+        # Check if there's already a pending payment
+        existing_payment = Payment.objects.filter(
             student=student,
-            reference=reference,
-            amount=settings.APPLICATION_FEE
-        )
+            status='pending'
+        ).first()
+        
+        if existing_payment:
+            reference = existing_payment.reference
+        else:
+            # Create new payment record
+            reference = str(uuid.uuid4())
+            payment = Payment.objects.create(
+                student=student,
+                reference=reference,
+                amount=settings.APPLICATION_FEE
+            )
         
         # Paystack payment data
-        payment_data = {
-            'amount': settings.APPLICATION_FEE_KOBO,  # Amount in kobo
-            'email': student.user.email,
-            'reference': reference,
-            'callback_url': request.build_absolute_uri(reverse('verify_payment')),
-        }
-        
         return JsonResponse({
             'reference': reference,
             'amount': settings.APPLICATION_FEE_KOBO,
             'email': student.user.email,
             'public_key': settings.PAYSTACK_PUBLIC_KEY,
+            'callback_url': request.build_absolute_uri(reverse('verify_payment')),
         })
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required
 def verify_payment(request):
@@ -134,36 +139,59 @@ def verify_payment(request):
         payment = Payment.objects.get(reference=reference)
         student = payment.student
         
+        # Check if this payment belongs to the current user
+        if student.user != request.user:
+            messages.error(request, 'Invalid payment reference for this account')
+            return redirect('dashboard')
+        
         # Verify payment with Paystack
         headers = {
             'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}',
             'Content-Type': 'application/json',
         }
         
-        response = requests.get(
-            f'https://api.paystack.co/transaction/verify/{reference}',
-            headers=headers
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            if data['status'] and data['data']['status'] == 'success':
-                # Payment successful
-                payment.status = 'success'
-                payment.paystack_reference = data['data']['reference']
-                payment.save()
-                
-                student.has_paid = True
-                student.can_apply = True
-                student.save()
-                
-                messages.success(request, 'Payment successful! You can now fill your application form.')
+        try:
+            response = requests.get(
+                f'https://api.paystack.co/transaction/verify/{reference}',
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data['status'] and data['data']['status'] == 'success':
+                    # Verify the amount matches
+                    paid_amount = data['data']['amount']  # Amount in kobo
+                    expected_amount = settings.APPLICATION_FEE_KOBO
+                    
+                    if paid_amount >= expected_amount:
+                        # Payment successful
+                        payment.status = 'success'
+                        payment.paystack_reference = data['data']['reference']
+                        payment.save()
+                        
+                        # Update student status
+                        student.has_paid = True
+                        student.can_apply = True
+                        student.save()
+                        
+                        messages.success(request, 'Payment successful! You can now fill your application form.')
+                    else:
+                        payment.status = 'failed'
+                        payment.save()
+                        messages.error(request, 'Payment amount verification failed.')
+                else:
+                    payment.status = 'failed'
+                    payment.save()
+                    messages.error(request, f'Payment failed: {data.get("message", "Unknown error")}')
             else:
                 payment.status = 'failed'
                 payment.save()
-                messages.error(request, 'Payment verification failed.')
-        else:
-            messages.error(request, 'Payment verification failed.')
+                messages.error(request, 'Payment verification failed. Please contact support.')
+        except requests.exceptions.RequestException as e:
+            messages.error(request, 'Network error during payment verification. Please try again.')
+        except Exception as e:
+            messages.error(request, 'An error occurred during payment verification. Please contact support.')
     
     except Payment.DoesNotExist:
         messages.error(request, 'Payment record not found.')
@@ -179,32 +207,17 @@ def application_form(request):
         messages.error(request, 'Please complete payment or use referral code to access application form.')
         return redirect('dashboard')
     
-    # Get or create application - provide all required fields in defaults
-    try:
-        application = Application.objects.get(student=student)
-        created = False
-    except Application.DoesNotExist:
-        # Create with minimal required fields only
-        application = Application.objects.create(
-            student=student,
-            first_name=student.user.first_name or '',
-            surname=student.user.last_name or '',
-            email=student.user.email,
-            phone=student.phone,
-            # Set default values for required fields
-            date_of_birth=timezone.now().date(),  # Temporary default
-            address='',  # Empty string for required CharField
-            lga='',
-            state_of_origin='',
-            guardian_name='',
-            guardian_phone='',
-            guardian_address='',
-            guardian_relationship='',
-            declaration_text=''
-        )
-        created = True
+    # Get or create application
+    application, created = Application.objects.get_or_create(
+        student=student,
+        defaults={
+            'first_name': student.user.first_name,
+            'surname': student.user.last_name,
+            'email': student.user.email,
+            'phone': student.phone,
+        }
+    )
     
-    # Rest of your code remains the same...
     # Create formsets for related models
     SchoolFormSet = formset_factory(SchoolAttendedForm, extra=3, max_num=3)
     SSCEFormSet = formset_factory(SSCEResultForm, extra=2, max_num=2)
@@ -352,7 +365,6 @@ def application_form(request):
     
     return render(request, 'admission/application_form.html', context)
 
-    
 @login_required
 def download_application_pdf(request):
     """Generate and download application form as PDF"""

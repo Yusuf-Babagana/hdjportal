@@ -11,6 +11,7 @@ urlpatterns = [
     path('application/', views.application_form, name='application_form'),
     path('payment/initiate/', views.initiate_payment, name='initiate_payment'),
     path('payment/verify/', views.verify_payment, name='verify_payment'),
+    path('payment/callback/', views.verify_payment, name='payment_callback'),
     path('application/pdf/', views.download_application_pdf, name='download_application_pdf'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),

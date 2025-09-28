@@ -255,6 +255,10 @@
 {% if not student.can_apply %}
 <script>
 document.getElementById('payBtn').addEventListener('click', function() {
+    const payBtn = this;
+    payBtn.disabled = true;
+    payBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+    
     // Get payment details
     fetch('{% url "initiate_payment" %}', {
         method: 'POST',
@@ -265,6 +269,9 @@ document.getElementById('payBtn').addEventListener('click', function() {
     })
     .then(response => response.json())
     .then(data => {
+        payBtn.disabled = false;
+        payBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Pay ₦{{ application_fee|floatformat:0 }}';
+        
         if (data.error) {
             alert(data.error);
             return;
@@ -276,17 +283,21 @@ document.getElementById('payBtn').addEventListener('click', function() {
             email: data.email,
             amount: data.amount,
             ref: data.reference,
+            currency: 'NGN',
             callback: function(response) {
                 // Payment successful, redirect to verify
+                alert('Payment successful! Redirecting to verify...');
                 window.location.href = '{% url "verify_payment" %}?reference=' + response.reference;
             },
             onClose: function() {
-                alert('Payment was cancelled.');
+                console.log('Payment window closed');
             }
         });
         handler.openIframe();
     })
     .catch(error => {
+        payBtn.disabled = false;
+        payBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Pay ₦{{ application_fee|floatformat:0 }}';
         console.error('Error:', error);
         alert('An error occurred. Please try again.');
     });
