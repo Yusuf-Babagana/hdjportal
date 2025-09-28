@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact - CHSTH{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-12">
+                <h1 class="display-4 fw-bold mb-4">Contact Us</h1>
+                <p class="lead">Get in touch with CHSTH for admissions and general inquiries</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Information -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <h2 class="fw-bold text-primary mb-4">Contact Information</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-map-marker-alt text-primary me-2"></i>Address
+                                </h5>
+                                <p class="card-text">
+                                    College of Health Sciences and Technology Hadejia<br>
+                                    PMB 1019, Hadejia<br>
+                                    Jigawa State, Nigeria
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-phone text-primary me-2"></i>Phone
+                                </h5>
+                                <p class="card-text">
+                                    Office: +234 XXX XXX XXXX<br>
+                                    Registrar: +234 XXX XXX XXXX<br>
+                                    Admissions: +234 XXX XXX XXXX
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-envelope text-primary me-2"></i>Email
+                                </h5>
+                                <p class="card-text">
+                                    General: info@chsth.edu.ng<br>
+                                    Admissions: admissions@chsth.edu.ng<br>
+                                    Registrar: registrar@chsth.edu.ng
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-clock text-primary me-2"></i>Office Hours
+                                </h5>
+                                <p class="card-text">
+                                    Monday - Friday: 8:00 AM - 4:00 PM<br>
+                                    Saturday: 9:00 AM - 1:00 PM<br>
+                                    Sunday: Closed
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-question-circle me-2"></i>Admissions Help
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Need help with your application? Contact our admissions team:</p>
+                        
+                        <div class="mb-3">
+                            <strong>Application Support</strong><br>
+                            <small class="text-muted">For technical issues with the online application form</small><br>
+                            <i class="fas fa-phone me-1"></i> +234 XXX XXX XXXX<br>
+                            <i class="fas fa-envelope me-1"></i> support@chsth.edu.ng
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Academic Inquiries</strong><br>
+                            <small class="text-muted">For questions about programs and courses</small><br>
+                            <i class="fas fa-phone me-1"></i> +234 XXX XXX XXXX<br>
+                            <i class="fas fa-envelope me-1"></i> academics@chsth.edu.ng
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                Response time: We typically respond to inquiries within 24-48 hours during business days.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center mb-5">
+                <h2 class="fw-bold text-primary">Frequently Asked Questions</h2>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                What is the application fee?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                The application fee is ₦7,500. You can pay online using your debit card or bank transfer through Paystack. If you have a referral code, you can skip the payment.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                What documents do I need to upload?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Required documents include: SSCE Results, Primary School Certificate, Indigene Certificate, Birth Certificate/Declaration of Age, and any other relevant credentials.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                When is the application deadline?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Please contact the admissions office for current application deadlines as they may vary by program and academic session.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                Can I edit my application after submission?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                No, once your application is submitted, you cannot make changes. Please review all information carefully before submitting.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

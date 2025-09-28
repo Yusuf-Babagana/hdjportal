@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}CHSTH Admission Portal - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Welcome to CHSTH Admission Portal</h1>
+                <p class="lead mb-4">College of Health Sciences and Technology Hadejia - Your gateway to a successful healthcare career.</p>
+                <div class="d-flex gap-3">
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'register' %}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Apply Now
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    {% else %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=600" 
+                     alt="Healthcare Students" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center mb-5">
+                <h2 class="fw-bold text-primary">Application Process</h2>
+                <p class="lead">Follow these simple steps to complete your admission application</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-user-plus fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">1. Register Account</h5>
+                        <p class="card-text">Create your student account with basic information and contact details.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-credit-card fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">2. Payment or Referral</h5>
+                        <p class="card-text">Pay ₦{{ application_fee|floatformat:0 }} application fee or use a referral code to proceed.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-file-alt fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title">3. Fill Application</h5>
+                        <p class="card-text">Complete the comprehensive application form and upload required documents.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Courses Preview Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center mb-5">
+                <h2 class="fw-bold text-primary">Available Programs</h2>
+                <p class="lead">Choose from our comprehensive healthcare programs</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-user-md me-2"></i>Community Health (SCHEW)
+                        </h5>
+                        <p class="card-text">Diploma in Community Health - Senior Community Health Extension Worker program.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-heartbeat me-2"></i>Community Health (JCHEW)
+                        </h5>
+                        <p class="card-text">Certificate in Community Health - Junior Community Health Extension Worker program.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-database me-2"></i>Health Information Management
+                        </h5>
+                        <p class="card-text">Diploma in Health Information Management - Managing healthcare data and records.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-leaf me-2"></i>Environmental Health
+                        </h5>
+                        <p class="card-text">Diploma in Environmental Health - Protecting public health through environmental management.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-x-ray me-2"></i>X-Ray and Imaging
+                        </h5>
+                        <p class="card-text">Diploma in X-Ray and Imaging - Medical imaging and diagnostic procedures.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="fas fa-apple-alt me-2"></i>Nutrition and Dietetics
+                        </h5>
+                        <p class="card-text">Diploma in Nutrition and Dietetics - Promoting health through proper nutrition.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-12 text-center">
+                <a href="{% url 'courses' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-eye me-2"></i>View All Programs
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold text-primary mb-4">Ready to Start Your Healthcare Career?</h2>
+                <p class="lead mb-4">Join thousands of successful healthcare professionals who started their journey at CHSTH.</p>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-rocket me-2"></i>Start Application
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-phone me-2"></i>Contact Us
+                    </a>
+                {% else %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-tachometer-alt me-2"></i>Continue Application
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

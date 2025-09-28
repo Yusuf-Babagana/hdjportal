@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - CHSTH{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </h2>
+                    <p class="text-muted mb-0">Welcome, {{ user.get_full_name|default:user.username }}!</p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Last login: {{ user.last_login|date:"M d, Y H:i" }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Payment Status -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            {% if student.has_paid or student.referral_code %}
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            {% else %}
+                                <i class="fas fa-exclamation-circle fa-2x text-warning"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title mb-1">Payment Status</h6>
+                            {% if student.has_paid %}
+                                <span class="badge bg-success">Paid</span>
+                                <small class="d-block text-muted mt-1">₦{{ application_fee|floatformat:0 }} - Completed</small>
+                            {% elif student.referral_code %}
+                                <span class="badge bg-info">Referral Used</span>
+                                <small class="d-block text-muted mt-1">Code: {{ student.referral_code.code }}</small>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                                <small class="d-block text-muted mt-1">₦{{ application_fee|floatformat:0 }} required</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Application Status -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            {% if application %}
+                                {% if application.is_submitted %}
+                                    <i class="fas fa-paper-plane fa-2x text-primary"></i>
+                                {% else %}
+                                    <i class="fas fa-edit fa-2x text-info"></i>
+                                {% endif %}
+                            {% else %}
+                                <i class="fas fa-file-plus fa-2x text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title mb-1">Application Status</h6>
+                            {% if application %}
+                                {% if application.is_submitted %}
+                                    <span class="badge bg-primary">{{ application.get_status_display }}</span>
+                                    <small class="d-block text-muted mt-1">{{ application.application_number }}</small>
+                                {% else %}
+                                    <span class="badge bg-info">In Progress</span>
+                                    <small class="d-block text-muted mt-1">{{ application.application_number }}</small>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Not Started</span>
+                                <small class="d-block text-muted mt-1">Complete payment first</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Access Status -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            {% if student.can_apply %}
+                                <i class="fas fa-unlock fa-2x text-success"></i>
+                            {% else %}
+                                <i class="fas fa-lock fa-2x text-danger"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title mb-1">Application Access</h6>
+                            {% if student.can_apply %}
+                                <span class="badge bg-success">Unlocked</span>
+                                <small class="d-block text-muted mt-1">You can fill the form</small>
+                            {% else %}
+                                <span class="badge bg-danger">Locked</span>
+                                <small class="d-block text-muted mt-1">Payment required</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Cards -->
+    <div class="row g-4">
+        <!-- Payment Card -->
+        {% if not student.can_apply %}
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-credit-card me-2 text-primary"></i>Make Payment
+                    </h5>
+                    <p class="card-text">Pay the application fee of ₦{{ application_fee|floatformat:0 }} to access the application form.</p>
+                    <button id="payBtn" class="btn btn-success btn-lg">
+                        <i class="fas fa-credit-card me-2"></i>Pay ₦{{ application_fee|floatformat:0 }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Application Form Card -->
+        {% if student.can_apply %}
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-file-alt me-2 text-primary"></i>Application Form
+                    </h5>
+                    {% if application %}
+                        {% if application.is_submitted %}
+                            <p class="card-text">Your application has been submitted successfully.</p>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'download_application_pdf' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-download me-2"></i>Download PDF
+                                </a>
+                                <span class="badge bg-{{ application.status }} align-self-center ms-2">{{ application.get_status_display }}</span>
+                            </div>
+                        {% else %}
+                            <p class="card-text">Continue filling your application form.</p>
+                            <a href="{% url 'application_form' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-edit me-2"></i>Continue Application
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <p class="card-text">Start filling your admission application form.</p>
+                        <a href="{% url 'application_form' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>Start Application
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Help Card -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-question-circle me-2 text-info"></i>Need Help?
+                    </h5>
+                    <p class="card-text">Get assistance with your application process.</p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'contact' %}" class="btn btn-outline-info">
+                            <i class="fas fa-phone me-2"></i>Contact Support
+                        </a>
+                        <a href="{% url 'courses' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-eye me-2"></i>View Courses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if application and application.is_submitted %}
+    <!-- Application Summary -->
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Application Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Application Number:</strong></td>
+                                    <td>{{ application.application_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Full Name:</strong></td>
+                                    <td>{{ application.first_name }} {{ application.surname }} {{ application.other_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date of Birth:</strong></td>
+                                    <td>{{ application.date_of_birth }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ application.email }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>First Choice:</strong></td>
+                                    <td>{{ application.get_first_choice_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Second Choice:</strong></td>
+                                    <td>{{ application.get_second_choice_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td><span class="badge bg-{{ application.status }}">{{ application.get_status_display }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Submitted:</strong></td>
+                                    <td>{{ application.submitted_at|date:"M d, Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Payment Script -->
+{% if not student.can_apply %}
+<script>
+document.getElementById('payBtn').addEventListener('click', function() {
+    // Get payment details
+    fetch('{% url "initiate_payment" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        
+        // Initialize Paystack
+        let handler = PaystackPop.setup({
+            key: data.public_key,
+            email: data.email,
+            amount: data.amount,
+            ref: data.reference,
+            callback: function(response) {
+                // Payment successful, redirect to verify
+                window.location.href = '{% url "verify_payment" %}?reference=' + response.reference;
+            },
+            onClose: function() {
+                alert('Payment was cancelled.');
+            }
+        });
+        handler.openIframe();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

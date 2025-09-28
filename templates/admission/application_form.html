@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Application Form - CHSTH{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary">
+                        <i class="fas fa-file-alt me-2"></i>Application Form
+                    </h2>
+                    <p class="text-muted mb-0">Application Number: <strong>{{ application.application_number }}</strong></p>
+                </div>
+                <div>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Application Progress</h6>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" 
+                             aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ progress }}% Complete - Complete all sections to submit your application</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Tabs -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="applicationTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab">
+                                <i class="fas fa-user me-1"></i>Personal Info
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="schools-tab" data-bs-toggle="tab" data-bs-target="#schools" type="button" role="tab">
+                                <i class="fas fa-school me-1"></i>Schools
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ssce-tab" data-bs-toggle="tab" data-bs-target="#ssce" type="button" role="tab">
+                                <i class="fas fa-certificate me-1"></i>SSCE Results
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab">
+                                <i class="fas fa-graduation-cap me-1"></i>Courses
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="declaration-tab" data-bs-toggle="tab" data-bs-target="#declaration" type="button" role="tab">
+                                <i class="fas fa-file-signature me-1"></i>Declaration
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">
+                                <i class="fas fa-upload me-1"></i>Documents
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card-body">
+                    <div class="tab-content" id="applicationTabContent">
+                        <!-- Section A: Personal Information -->
+                        <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="personal">
+                                
+                                {{ personal_form|crispy }}
+                                
+                                <hr class="my-4">
+                                
+                                {{ guardian_form|crispy }}
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save Personal Information
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Section B: Schools Attended -->
+                        <div class="tab-pane fade" id="schools" role="tabpanel">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="schools">
+                                
+                                <h5 class="mb-4"><i class="fas fa-school me-2"></i>Schools Attended</h5>
+                                <p class="text-muted">List up to 3 schools you have attended (Primary, Secondary, etc.)</p>
+                                
+                                {{ school_formset.management_form }}
+                                <div id="school-formset">
+                                    {% for form in school_formset %}
+                                        <div class="border rounded p-3 mb-3 school-form">
+                                            <h6>School {{ forloop.counter }}</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    {{ form.school_name }}
+                                                    <small class="form-text text-muted">School Name</small>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    {{ form.from_year }}
+                                                    <small class="form-text text-muted">From Year</small>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    {{ form.to_year }}
+                                                    <small class="form-text text-muted">To Year</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save Schools Information
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Section C: SSCE Results -->
+                        <div class="tab-pane fade" id="ssce" role="tabpanel">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="ssce">
+                                
+                                <h5 class="mb-4"><i class="fas fa-certificate me-2"></i>SSCE Results</h5>
+                                <p class="text-muted">Enter your WAEC/NECO/NABTEB/NBAIS results (up to 2 sittings)</p>
+                                
+                                {{ ssce_formset.management_form }}
+                                <div id="ssce-formset">
+                                    {% for form in ssce_formset %}
+                                        <div class="border rounded p-4 mb-4 ssce-form">
+                                            <h6>{% if form.instance.sitting_number %}{{ form.instance.get_sitting_number_display }}{% else %}Sitting {{ forloop.counter }}{% endif %}</h6>
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Sitting Number</label>
+                                                    {{ form.sitting_number }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Exam Type</label>
+                                                    {{ form.exam_type }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Exam Number</label>
+                                                    {{ form.exam_number }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Year</label>
+                                                    {{ form.year }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Registration Number</label>
+                                                    {{ form.registration_number }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Centre Number</label>
+                                                    {{ form.centre_number }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Centre Name</label>
+                                                    {{ form.centre_name }}
+                                                </div>
+                                            </div>
+                                            
+                                            <h6 class="text-primary">Required Subjects</h6>
+                                            <div class="row mb-3">
+                                                <div class="col-md-2">
+                                                    <label class="form-label">English</label>
+                                                    {{ form.english_grade }}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Mathematics</label>
+                                                    {{ form.mathematics_grade }}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Biology</label>
+                                                    {{ form.biology_grade }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Chemistry</label>
+                                                    {{ form.chemistry_grade }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Physics</label>
+                                                    {{ form.physics_grade }}
+                                                </div>
+                                            </div>
+                                            
+                                            <h6 class="text-secondary">Other Subjects</h6>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Subject 1</label>
+                                                    {{ form.subject_1 }}
+                                                    {{ form.subject_1_grade }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Subject 2</label>
+                                                    {{ form.subject_2 }}
+                                                    {{ form.subject_2_grade }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Subject 3</label>
+                                                    {{ form.subject_3 }}
+                                                    {{ form.subject_3_grade }}
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Subject 4</label>
+                                                    {{ form.subject_4 }}
+                                                    {{ form.subject_4_grade }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save SSCE Results
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Section D: Course Selection -->
+                        <div class="tab-pane fade" id="courses" role="tabpanel">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="courses">
+                                
+                                {{ course_form|crispy }}
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save Course Selection
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Section E: Declaration -->
+                        <div class="tab-pane fade" id="declaration" role="tabpanel">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="declaration">
+                                
+                                {{ declaration_form|crispy }}
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save Declaration
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Document Upload -->
+                        <div class="tab-pane fade" id="documents" role="tabpanel">
+                            <h5 class="mb-4"><i class="fas fa-upload me-2"></i>Document Upload</h5>
+                            
+                            <!-- Existing Documents -->
+                            {% if existing_documents %}
+                            <div class="mb-4">
+                                <h6>Uploaded Documents</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Document Type</th>
+                                                <th>File Name</th>
+                                                <th>Upload Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for doc in existing_documents %}
+                                            <tr>
+                                                <td>{{ doc.get_document_type_display }}</td>
+                                                <td><a href="{{ doc.document.url }}" target="_blank">{{ doc.document.name|cut:"documents/" }}</a></td>
+                                                <td>{{ doc.uploaded_at|date:"M d, Y H:i" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Upload Form -->
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="documents">
+                                
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-info-circle me-2"></i>Required Documents:</h6>
+                                    <ul class="mb-0">
+                                        <li>SSCE Results (WAEC/NECO/NABTEB/NBAIS)</li>
+                                        <li>Primary School Certificate</li>
+                                        <li>Indigene Certificate</li>
+                                        <li>Birth Certificate/Declaration of Age</li>
+                                        <li>Other Credentials (optional)</li>
+                                    </ul>
+                                </div>
+                                
+                                {{ document_formset.management_form }}
+                                <div id="document-formset">
+                                    {% for form in document_formset %}
+                                        <div class="border rounded p-3 mb-3 document-form">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Document Type</label>
+                                                    {{ form.document_type }}
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <label class="form-label">Choose File</label>
+                                                    {{ form.document }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-upload me-2"></i>Upload Documents
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Submit Application -->
+    {% if not application.is_submitted %}
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Application
+                    </h5>
+                    <p class="card-text">Once you've completed all sections, submit your application for review.</p>
+                    <form method="post" onsubmit="return confirm('Are you sure you want to submit your application? You won\'t be able to make changes after submission.');">
+                        {% csrf_token %}
+                        <input type="hidden" name="section" value="submit">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Application
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.nav-tabs .nav-link {
+    color: var(--primary-color);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.school-form, .ssce-form, .document-form {
+    background-color: #f8f9fa;
+}
+
+/* Style form fields to look like form-control */
+.school-form input, .ssce-form input, .ssce-form select, .document-form select, .document-form input[type="file"] {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.school-form input:focus, .ssce-form input:focus, .ssce-form select:focus, .document-form select:focus, .document-form input[type="file"]:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+</style>
+{% endblock %}

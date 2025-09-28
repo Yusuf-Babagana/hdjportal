@@ -1,0 +1,10 @@
+Django==4.2.24
+djangorestframework
+django-crispy-forms
+crispy-bootstrap5
+requests
+python-decouple
+django-environ
+Pillow
+gunicorn
+whitenoise
